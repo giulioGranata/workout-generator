@@ -1,0 +1,30 @@
+modules = ["nodejs-20"]
+[nix]
+channel = "stable-24_05"
+packages = ["run"]
+
+[deployment]
+run = ["npm", "run", "dev"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
+
+[[ports]]
+localPort = 3002
+externalPort = 3002
+
+[workflows]
+
+[[workflows.workflow]]
+name = "Run"
+author = 16893024
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd workout-generator-app && npm run dev"
