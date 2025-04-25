@@ -20,15 +20,20 @@ import {
 } from "@/components/ui/tooltip";
 import { generateWorkout } from "@/lib/generator";
 import { ZONES } from "@/lib/constants";
+import { WorkoutBlock } from "@/lib/types";
+import { WorkoutChart } from "@/components/WorkoutChart";
+import { WorkoutBlocksBar } from "@/components/WorkoutBlocksBar"
 
 type Zone = (typeof ZONES)[number];
 
 export function WorkoutForm() {
-  const [ftp, setFtp] = useState("");
-  const [duration, setDuration] = useState("");
+  const [ftp, setFtp] = useState("200");
+  const [duration, setDuration] = useState("60");
   const [zone, setZone] = useState<Zone | "">("");
   const [output, setOutput] = useState("");
   const [copied, setCopied] = useState(false);
+
+  const [blocks, setBlocks] = useState<WorkoutBlock[]>([]);
 
   const handleGenerate = () => {
     if (!ftp || !duration || !zone) {
@@ -42,7 +47,14 @@ export function WorkoutForm() {
       zone,
     });
 
-    setOutput(result);
+    const { text, blocks } = generateWorkout({
+      ftp: parseInt(ftp),
+      duration: parseInt(duration),
+      zone,
+    });
+
+    setOutput(text);
+    setBlocks(blocks);
     setCopied(false);
   };
 
@@ -59,8 +71,9 @@ export function WorkoutForm() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-6">
+    <div className="max-w-xl mx-auto px-4 py-8 space-y-6">
+      {/* Form */}
+      <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="ftp">FTP (Watt)</Label>
           <Input
@@ -82,8 +95,8 @@ export function WorkoutForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Target Zonne</Label>
-          <Select onValueChange={(value) => setZone(value)}>
+          <Label>Target Zone</Label>
+          <Select onValueChange={(value) => setZone(value as Zone)}>
             <SelectTrigger>
               <SelectValue placeholder="Select Zone (Z1–Z7)" />
             </SelectTrigger>
@@ -97,26 +110,38 @@ export function WorkoutForm() {
           </Select>
         </div>
 
-        <Button onClick={handleGenerate}>Genera workout</Button>
+        <Button onClick={handleGenerate}>Generate workout</Button>
       </div>
-      {output && (
-        <div className="mt-6 p-4 bg-zinc-100 rounded font-mono text-sm space-y-2">
-          <pre className="whitespace-pre-line">{output}</pre>
 
-          <div className="flex justify-end w-full">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={handleCopy}>
-                  {copied ? <CheckIcon className="h-4 w-4 text-green-500" /> : <CopyIcon className="h-4 w-4" />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                {copied ? "Copied!" : "Copy to clipboard"}
-              </TooltipContent>
-            </Tooltip>
+      {/* Output */}
+      {output && (
+        <>
+            <div className="p-4 bg-zinc-100 dark:bg-zinc-900 rounded font-mono text-sm leading-relaxed text-zinc-900 dark:text-zinc-100 whitespace-pre-line overflow-x-auto relative">
+              <pre className="whitespace-pre-line pr-12">{output}</pre>
+
+            <div className="absolute bottom-2 right-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={handleCopy}>
+                    {copied ? (
+                      <CheckIcon className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <CopyIcon className="h-4 w-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  {copied ? "Copied!" : "Copy to clipboard"}
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
-        </div>
+
+          {blocks.length > 0 && ftp && (
+            <WorkoutBlocksBar blocks={blocks} ftp={parseInt(ftp)} />
+          )}
+        </>
       )}
     </div>
-  );
+  )
 }
