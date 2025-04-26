@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { CopyIcon, Link2Icon, CheckIcon } from "lucide-react";
+import { CopyIcon, Link2Icon, CheckIcon, FileText, File } from "lucide-react";
 import {
   Tooltip,
   TooltipTrigger,
@@ -122,21 +122,16 @@ export function WorkoutForm() {
         </div>
         <Button onClick={handleGenerate}>Generate workout</Button>
       </div>
-
       {output && (
         <>
-          {/* Text box with Copy & Link */}
+          {/* Textual output */}
           <div className="relative p-4 bg-zinc-100 dark:bg-zinc-900 rounded font-mono text-sm leading-relaxed text-zinc-900 dark:text-zinc-100 whitespace-pre-line overflow-x-auto">
             <pre className="pr-12">{output}</pre>
+            {/* Inline toolbar (copy text + copy link) */}
             <div className="absolute bottom-2 right-2 flex space-x-2">
-              {/* Copy text */}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleCopyResult}
-                  >
+                  <Button variant="ghost" size="icon" onClick={handleCopyResult}>
                     {copied ? (
                       <CheckIcon className="h-4 w-4 text-green-500" />
                     ) : (
@@ -145,11 +140,10 @@ export function WorkoutForm() {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  {copied ? "Copied!" : "Copy text"}
+                  {copied ? "Copied text" : "Copy text"}
                 </TooltipContent>
               </Tooltip>
 
-              {/* Copy link */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon" onClick={handleCopyLink}>
@@ -162,24 +156,24 @@ export function WorkoutForm() {
           </div>
 
           {/* Download buttons */}
-          <div className="flex flex-wrap justify-end space-x-2 mt-4">
+          <div className="flex flex-wrap items-center justify-end space-x-2 mt-4">
             <Button
               variant="outline"
               onClick={() => exportTxt("workout.txt", output)}
             >
-              Download .txt
+              <FileText className="h-4 w-4 mr-2" />
+              TXT
             </Button>
             <Button
               variant="outline"
-              onClick={() =>
-                exportZwo("workout.zwo", blocks, parseInt(ftp, 10))
-              }
+              onClick={() => exportZwo("workout.zwo", blocks, parseInt(ftp, 10))}
             >
-              Download .zwo
+              <File className="h-4 w-4 mr-2" />
+              ZWO
             </Button>
           </div>
 
-          {/* Visual bar */}
+          {/* Visual Zwift-style preview */}
           {blocks.length > 0 && (
             <WorkoutBlocksBar blocks={blocks} ftp={parseInt(ftp, 10)} />
           )}
