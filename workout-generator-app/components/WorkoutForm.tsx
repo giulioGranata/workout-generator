@@ -13,7 +13,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { CopyIcon, Link2Icon, CheckIcon, FileText, File } from "lucide-react";
+import {
+  CopyIcon,
+  Link2Icon,
+  CheckIcon,
+  FileText,
+  File,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipTrigger,
@@ -23,50 +29,62 @@ import { generateWorkout } from "@/lib/generator";
 import { exportTxt } from "@/lib/export";
 import { exportZwo } from "@/lib/exportZwo";
 import { WorkoutBlocksBar } from "@/components/WorkoutBlocksBar";
-import { ZONES } from "@/lib/constants";
-import type { Zone } from "@/lib/types";
+import {
+  TEMPLATES,
+  TEMPLATE_ZONE_MAP,
+  Template,
+} from "@/lib/constants";
 
 export function WorkoutForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Initialize from querystring
+  // form state
+  const [template, setTemplate] = useState<Template>(TEMPLATES[0]);
   const [ftp, setFtp] = useState<string>("");
   const [duration, setDuration] = useState<string>("");
-  const [zone, setZone] = useState<Zone | "">("");
+
+  // result state
   const [output, setOutput] = useState<string>("");
   const [blocks, setBlocks] = useState<any[]>([]);
   const [copied, setCopied] = useState(false);
 
+  // initialize from URL query
   useEffect(() => {
     const qFtp = searchParams.get("ftp");
     const qDur = searchParams.get("duration");
-    const qZone = searchParams.get("zone");
+    const qTpl = searchParams.get("template");
     if (qFtp) setFtp(qFtp);
     if (qDur) setDuration(qDur);
-    if (qZone && ZONES.includes(qZone as Zone)) setZone(qZone as Zone);
+    if (qTpl && TEMPLATES.includes(qTpl as Template))
+      setTemplate(qTpl as Template);
   }, [searchParams]);
 
   const handleGenerate = () => {
-    if (!ftp || !duration || !zone) {
+    if (!ftp || !duration) {
       toast("Please fill all fields");
       return;
     }
 
-    const { text, blocks: wb } = generateWorkout({
+    // derive zone from template
+    const selectedZone = TEMPLATE_ZONE_MAP[template];
+
+    const { text, blocks: workoutBlocks } = generateWorkout({
       ftp: parseInt(ftp, 10),
       duration: parseInt(duration, 10),
-      zone,
+      zone: selectedZone,
+      template,
     });
 
     setOutput(text);
-    setBlocks(wb);
+    setBlocks(workoutBlocks);
     setCopied(false);
 
-    // update URL without full reload
-    router.replace(`?ftp=${ftp}&duration=${duration}&zone=${zone}`, {
-      scroll: false,
-    });
+    // update querystring (shallow)
+    router.replace(
+      `?ftp=${ftp}&duration=${duration}&template=${template}`,
+      { scroll: false }
+    );
   };
 
   const handleCopyResult = () => {
@@ -78,8 +96,7 @@ export function WorkoutForm() {
   };
 
   const handleCopyLink = () => {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(window.location.href);
     toast("Link copied!");
   };
 
@@ -87,6 +104,27 @@ export function WorkoutForm() {
     <div className="max-w-xl mx-auto px-4 py-8 space-y-6">
       {/* Form */}
       <div className="space-y-4">
+        {/* Template select */}
+        <div className="space-y-2">
+          <Label>Template</Label>
+          <Select
+            value={template}
+            onValueChange={(v) => setTemplate(v as Template)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Choose style" />
+            </SelectTrigger>
+            <SelectContent>
+              {TEMPLATES.map((t) => (
+                <SelectItem key={t} value={t}>
+                  {t}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* FTP input */}
         <div className="space-y-2">
           <Label htmlFor="ftp">FTP (W)</Label>
           <Input
@@ -96,6 +134,8 @@ export function WorkoutForm() {
             onChange={(e) => setFtp(e.target.value)}
           />
         </div>
+
+        {/* Duration input */}
         <div className="space-y-2">
           <Label htmlFor="duration">Duration (min)</Label>
           <Input
@@ -105,33 +145,26 @@ export function WorkoutForm() {
             onChange={(e) => setDuration(e.target.value)}
           />
         </div>
-        <div className="space-y-2">
-          <Label>Target Zone</Label>
-          <Select onValueChange={(v) => setZone(v as Zone)} value={zone}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Zone" />
-            </SelectTrigger>
-            <SelectContent>
-              {ZONES.map((z) => (
-                <SelectItem key={z} value={z}>
-                  {z}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+
         <Button onClick={handleGenerate}>Generate workout</Button>
       </div>
+
+      {/* Output & Actions */}
       {output && (
         <>
           {/* Textual output */}
           <div className="relative p-4 bg-zinc-100 dark:bg-zinc-900 rounded font-mono text-sm leading-relaxed text-zinc-900 dark:text-zinc-100 whitespace-pre-line overflow-x-auto">
             <pre className="pr-12">{output}</pre>
-            {/* Inline toolbar (copy text + copy link) */}
+
+            {/* Inline toolbar */}
             <div className="absolute bottom-2 right-2 flex space-x-2">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={handleCopyResult}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleCopyResult}
+                  >
                     {copied ? (
                       <CheckIcon className="h-4 w-4 text-green-500" />
                     ) : (
@@ -146,7 +179,11 @@ export function WorkoutForm() {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={handleCopyLink}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleCopyLink}
+                  >
                     <Link2Icon className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -166,7 +203,9 @@ export function WorkoutForm() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => exportZwo("workout.zwo", blocks, parseInt(ftp, 10))}
+              onClick={() =>
+                exportZwo("workout.zwo", blocks, parseInt(ftp, 10))
+              }
             >
               <File className="h-4 w-4 mr-2" />
               ZWO
