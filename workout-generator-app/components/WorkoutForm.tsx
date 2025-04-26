@@ -21,8 +21,8 @@ import {
 import { generateWorkout } from "@/lib/generator";
 import { ZONES } from "@/lib/constants";
 import { WorkoutBlock } from "@/lib/types";
-import { WorkoutChart } from "@/components/WorkoutChart";
-import { WorkoutBlocksBar } from "@/components/WorkoutBlocksBar"
+import { WorkoutBlocksBar } from "@/components/WorkoutBlocksBar";
+import { exportTxt } from "@/lib/export";
 
 type Zone = (typeof ZONES)[number];
 
@@ -40,13 +40,6 @@ export function WorkoutForm() {
       toast("Please fill in all fields");
       return;
     }
-
-    const result = generateWorkout({
-      ftp: parseInt(ftp),
-      duration: parseInt(duration),
-      zone,
-    });
-
     const { text, blocks } = generateWorkout({
       ftp: parseInt(ftp),
       duration: parseInt(duration),
@@ -116,8 +109,8 @@ export function WorkoutForm() {
       {/* Output */}
       {output && (
         <>
-            <div className="p-4 bg-zinc-100 dark:bg-zinc-900 rounded font-mono text-sm leading-relaxed text-zinc-900 dark:text-zinc-100 whitespace-pre-line overflow-x-auto relative">
-              <pre className="whitespace-pre-line pr-12">{output}</pre>
+          <div className="p-4 bg-zinc-100 dark:bg-zinc-900 rounded font-mono text-sm leading-relaxed text-zinc-900 dark:text-zinc-100 whitespace-pre-line overflow-x-auto relative">
+            <pre className="whitespace-pre-line pr-12">{output}</pre>
 
             <div className="absolute bottom-2 right-2">
               <Tooltip>
@@ -140,8 +133,16 @@ export function WorkoutForm() {
           {blocks.length > 0 && ftp && (
             <WorkoutBlocksBar blocks={blocks} ftp={parseInt(ftp)} />
           )}
+          <div className="flex justify-center mt-4">
+            <Button
+              variant="outline"
+              onClick={() => exportTxt("workout.txt", output)}
+            >
+              Download .txt
+            </Button>
+          </div>
         </>
       )}
     </div>
-  )
+  );
 }

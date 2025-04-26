@@ -10,7 +10,20 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  // Extend Next.js core web vitals, Next.js TS config, and the TS plugin recommendations
+  ...compat.extends(
+    "next/core-web-vitals",
+    "next/typescript",
+    "plugin:@typescript-eslint/recommended"
+  ),
+
+  // Your custom rules
+  {
+    rules: {
+      // Warn on console.log (allow console.warn and console.error)
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+    },
+  },
 ];
 
 export default eslintConfig;

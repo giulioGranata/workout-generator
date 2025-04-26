@@ -1,4 +1,4 @@
-import { ZONE_MAP, ZONES, ZoneColor } from "./constants"
+import { ZONE_MAP, ZONES } from "./constants"
 import { getZoneColorByFtp } from "./utils"
 import { WorkoutBlock, WorkoutInput, Zone } from "./types"
 
@@ -32,7 +32,7 @@ ${zoneTable}
 }
 
 function generateMainBlocks(zone: Zone, duration: number): WorkoutBlock[] {
-  const [_, maxFactor] = ZONE_MAP[zone]
+  const [, maxFactor] = ZONE_MAP[zone]
   const intervalOn = 5
   const intervalOff = 3
   const blockDuration = intervalOn + intervalOff
