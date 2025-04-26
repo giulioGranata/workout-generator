@@ -23,6 +23,7 @@ import { ZONES } from "@/lib/constants";
 import { WorkoutBlock } from "@/lib/types";
 import { WorkoutBlocksBar } from "@/components/WorkoutBlocksBar";
 import { exportTxt } from "@/lib/export";
+import { exportZwo } from "@/lib/exportZwo";
 
 type Zone = (typeof ZONES)[number];
 
@@ -133,12 +134,18 @@ export function WorkoutForm() {
           {blocks.length > 0 && ftp && (
             <WorkoutBlocksBar blocks={blocks} ftp={parseInt(ftp)} />
           )}
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center space-x-4 mt-4">
             <Button
               variant="outline"
               onClick={() => exportTxt("workout.txt", output)}
             >
               Download .txt
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => exportZwo("workout.zwo", blocks, parseInt(ftp))}
+            >
+              Download .zwo
             </Button>
           </div>
         </>
