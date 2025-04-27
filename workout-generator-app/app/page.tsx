@@ -1,19 +1,30 @@
+"use client"
+
+import { useState } from "react"
 import { WorkoutForm } from "@/components/WorkoutForm"
-import { ThemeSwitcher } from "@/components/ThemeSwitcher"
+import { PreviewPane } from "@/components/PreviewPane"
+import type { WorkoutBlock } from "@/lib/types"
 
-export default function Home() {
+export default function WorkoutPage() {
+  const [output, setOutput] = useState<string>("")
+  const [blocks, setBlocks] = useState<WorkoutBlock[]>([])
+  const [ftp, setFtp] = useState<number>(0)
+
   return (
-    <>
-      {/* Top nav */}
-      <header className="w-full px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Workout Generator</h1>
-        <ThemeSwitcher />
-      </header>
+    <main className="container mx-auto px-4 py-8">
+      <div className="grid gap-8 lg:grid-cols-[320px_1fr]">
+        {/* left: form */}
+        <WorkoutForm
+          onGenerate={(text, b, f) => {
+            setOutput(text)
+            setBlocks(b)
+            setFtp(f)
+          }}
+        />
 
-      {/* Main content */}
-      <main className="max-w-md mx-auto py-8 px-4">
-        <WorkoutForm />
-      </main>
-    </>
-    )
+        {/* right: preview */}
+        <PreviewPane output={output} blocks={blocks} ftp={ftp} />
+      </div>
+    </main>
+  )
 }

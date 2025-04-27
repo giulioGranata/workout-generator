@@ -8,24 +8,28 @@ type Props = {
 }
 
 export function WorkoutBlocksBar({ blocks, ftp }: Props) {
-  const totalDuration = blocks.reduce((sum, b) => sum + b.duration, 0)
+  if (!blocks.length) return null
+  const total = blocks.reduce((s, b) => s + b.duration, 0)
 
   return (
-    <div className="mt-6 w-full max-w-2xl mx-auto">
-      <div className="flex h-6 overflow-hidden rounded border border-zinc-300 shadow-sm bg-white dark:bg-zinc-800">
-        {blocks.map((block, i) => (
+    <div className="space-y-1">
+      {/* Colored bar */}
+      <div className="flex w-full h-6 lg:h-8 overflow-hidden rounded-md border border-zinc-400/40 shadow-inner">
+        {blocks.map((b, i) => (
           <div
             key={i}
-            title={`${block.label}: ${block.duration}’ @ ${Math.round(block.ftp * ftp)}W`}
+            title={`${b.label}: ${b.duration}’ @ ${Math.round(b.ftp * ftp)} W`}
             style={{
-              width: `${(block.duration / totalDuration) * 100}%`,
-              backgroundColor: block.color,
+              width: `${(b.duration / total) * 100}%`,
+              backgroundColor: b.color,
             }}
-            className="h-full border-r border-white last:border-r-0 cursor-help transition-all"
+            className="h-full cursor-help border-r border-white last:border-r-0 transition-all"
           />
         ))}
       </div>
-      <div className="text-xs text-zinc-400 mt-2 text-center italic">
+
+      {/* Caption */}
+      <div className="text-center text-xs text-zinc-500 italic">
         Workout visual preview
       </div>
     </div>

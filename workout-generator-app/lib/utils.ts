@@ -15,3 +15,18 @@ export function getZoneColorByFtp(ftpRatio: number): string {
   if (ftpRatio < 1.5) return ZoneColor.Z6
   return ZoneColor.Z7
 }
+
+export function compressBlocks(blocks: WorkoutBlock[]): WorkoutBlock[] {
+  if (blocks.length === 0) return []
+  const out: WorkoutBlock[] = [blocks[0]]
+  for (let i = 1; i < blocks.length; i++) {
+    const prev = out[out.length - 1]
+    const cur = blocks[i]
+    if (prev.ftp === cur.ftp && prev.color === cur.color) {
+      prev.duration += cur.duration
+    } else {
+      out.push({ ...cur })
+    }
+  }
+  return out
+}
