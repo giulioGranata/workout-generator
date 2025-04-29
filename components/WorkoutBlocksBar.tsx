@@ -19,7 +19,6 @@ type Props = {
 };
 
 export function WorkoutBlocksBar({ blocks, ftp }: Props) {
-  const total = blocks.reduce((sum, b) => sum + b.duration, 0);
   const [canHover, setCanHover] = useState(false);
 
   useEffect(() => {

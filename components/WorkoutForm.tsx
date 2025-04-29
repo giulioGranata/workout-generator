@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TEMPLATES, TEMPLATE_ZONE_MAP, Template } from "@/lib/constants";
+import { TEMPLATES, Template } from "@/lib/constants";
 import { generateWorkout } from "@/lib/generator";
 import type { WorkoutBlock } from "@/lib/types";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -47,12 +47,9 @@ export function WorkoutForm({
       return;
     }
 
-    const [selectedZone] = TEMPLATE_ZONE_MAP[template];
-
     const { text, blocks } = generateWorkout({
       ftp: parseInt(ftp, 10),
       duration: parseInt(duration, 10),
-      zone: selectedZone,
       template,
     });
 

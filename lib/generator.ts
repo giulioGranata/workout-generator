@@ -2,12 +2,10 @@ import { Template, TEMPLATE_ZONE_MAP, ZONE_MAP, ZONES } from "./constants";
 import { WorkoutBlock, WorkoutInput, Zone } from "./types";
 import { getZoneColorByFtp } from "./utils";
 
-export function generateWorkout({
-  ftp,
-  duration,
-  zone, // string, ma ora sempre derivata da template
-  template,
-}: WorkoutInput & { zone: Zone }): { text: string; blocks: WorkoutBlock[] } {
+export function generateWorkout({ ftp, duration, template }: WorkoutInput): {
+  text: string;
+  blocks: WorkoutBlock[];
+} {
   const workoutName = getWorkoutName(template);
   const zoneTable = getZoneTable(ftp);
   const mainBlocks = generateMainBlocks(
