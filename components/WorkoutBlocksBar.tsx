@@ -1,4 +1,3 @@
-// components/WorkoutBlocksBar.tsx
 "use client";
 
 import {
@@ -22,7 +21,6 @@ export function WorkoutBlocksBar({ blocks, ftp }: Props) {
             <Tooltip key={i}>
               <TooltipTrigger asChild>
                 <div
-                  // flex-grow = durata; flex-basis = 0
                   style={{ flex: b.duration, backgroundColor: b.color }}
                   className="h-full flex-shrink-0 flex-grow border-r border-white last:border-r-0 cursor-pointer transition-all"
                 />

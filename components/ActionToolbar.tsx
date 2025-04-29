@@ -1,52 +1,56 @@
-"use client"
+"use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/sheet";
 import {
-  CopyIcon,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { exportTxt } from "@/lib/export";
+import { exportZwo } from "@/lib/exportZwo";
+import type { WorkoutBlock } from "@/lib/types";
+import { useMediaQuery } from "@react-hook/media-query";
+import {
   CheckIcon,
-  Link2Icon,
-  FileText,
+  CopyIcon,
   File,
+  FileText,
+  Link2Icon,
   MenuIcon,
-} from "lucide-react"
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
-import { toast } from "sonner"
-import { exportTxt } from "@/lib/export"
-import { exportZwo } from "@/lib/exportZwo"
-import type { WorkoutBlock } from "@/lib/types"
-import { useState } from "react"
-import { useMediaQuery } from "@react-hook/media-query"
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export function ActionToolbar({
   output,
   blocks,
   ftp,
 }: {
-  output: string
-  blocks: WorkoutBlock[]
-  ftp: number
+  output: string;
+  blocks: WorkoutBlock[];
+  ftp: number;
 }) {
-  const [copied, setCopied] = useState(false)
-  const isDesktop = useMediaQuery("(min-width: 768px)")
+  const [copied, setCopied] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const copyText = () => {
-    navigator.clipboard.writeText(output)
-    setCopied(true)
-    toast("Workout copied!")
-    setTimeout(() => setCopied(false), 2000)
-  }
+    navigator.clipboard.writeText(output);
+    setCopied(true);
+    toast("Workout copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href)
-    toast("Link copied!")
-  }
+    navigator.clipboard.writeText(window.location.href);
+    toast("Link copied!");
+  };
 
   const Buttons = (
     <>
@@ -65,21 +69,44 @@ export function ActionToolbar({
         </TooltipContent>
       </Tooltip>
 
-      <Button variant="ghost" size="icon" onClick={copyLink}>
-        <Link2Icon className="h-4 w-4" />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" onClick={copyLink}>
+            <Link2Icon className="h-4 w-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          {copied ? "Copied" : "Copy link"}
+        </TooltipContent>
+      </Tooltip>
 
-      <Button variant="outline" onClick={() => exportTxt("workout.txt", output)}>
-        <FileText className="h-4 w-4 mr-1" />
-        TXT
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            onClick={() => exportTxt("workout.txt", output)}
+          >
+            <FileText className="h-4 w-4 mr-1" />
+            TXT
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="top">Export as TXT</TooltipContent>
+      </Tooltip>
 
-      <Button variant="outline" onClick={() => exportZwo("workout.zwo", blocks, ftp)}>
-        <File className="h-4 w-4 mr-1" />
-        ZWO
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            onClick={() => exportZwo("workout.zwo", blocks, ftp)}
+          >
+            <File className="h-4 w-4 mr-1" />
+            ZWO
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="top">Export as ZWO</TooltipContent>
+      </Tooltip>
     </>
-  )
+  );
 
   /* ---------- Render ---------- */
   if (isDesktop) {
@@ -88,7 +115,7 @@ export function ActionToolbar({
       <div className="flex flex-wrap items-center justify-end space-x-2">
         {Buttons}
       </div>
-    )
+    );
   }
 
   // mobile (< md) – hamburger + bottom sheet
@@ -116,5 +143,5 @@ export function ActionToolbar({
         {Buttons}
       </SheetContent>
     </Sheet>
-  )
+  );
 }
