@@ -1,37 +1,45 @@
-"use client"
+// components/WorkoutBlocksBar.tsx
+"use client";
 
-import { WorkoutBlock } from "@/lib/types"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { WorkoutBlock } from "@/lib/types";
 
 type Props = {
-  blocks: WorkoutBlock[]
-  ftp: number
-}
+  blocks: WorkoutBlock[];
+  ftp: number;
+};
 
 export function WorkoutBlocksBar({ blocks, ftp }: Props) {
-  if (!blocks.length) return null
-  const total = blocks.reduce((s, b) => s + b.duration, 0)
-
   return (
     <div className="space-y-1">
-      {/* Colored bar */}
-      <div className="flex w-full h-6 lg:h-8 overflow-hidden rounded-md border border-zinc-400/40 shadow-inner">
-        {blocks.map((b, i) => (
-          <div
-            key={i}
-            title={`${b.label}: ${b.duration}’ @ ${Math.round(b.ftp * ftp)} W`}
-            style={{
-              width: `${(b.duration / total) * 100}%`,
-              backgroundColor: b.color,
-            }}
-            className="h-full cursor-help border-r border-white last:border-r-0 transition-all"
-          />
-        ))}
+      <div className="w-full overflow-x-auto">
+        <div className="flex h-6 lg:h-8 overflow-hidden rounded-md border border-zinc-400/40 shadow-inner">
+          {blocks.map((b, i) => (
+            <Tooltip key={i}>
+              <TooltipTrigger asChild>
+                <div
+                  // flex-grow = durata; flex-basis = 0
+                  style={{ flex: b.duration, backgroundColor: b.color }}
+                  className="h-full flex-shrink-0 flex-grow border-r border-white last:border-r-0 cursor-pointer transition-all"
+                />
+              </TooltipTrigger>
+              <TooltipContent side="top" align="center" className="w-40">
+                <div className="font-semibold">{b.label}</div>
+                <div className="text-sm">
+                  {b.duration}′ @ {Math.round(b.ftp * ftp)} W
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
       </div>
-
-      {/* Caption */}
       <div className="text-center text-xs text-zinc-500 italic">
         Workout visual preview
       </div>
     </div>
-  )
+  );
 }
