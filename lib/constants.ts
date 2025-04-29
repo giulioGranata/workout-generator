@@ -24,8 +24,8 @@ export enum ZoneColor {
   Z7 = "#B71C1C", // dark red (personal choice for Z7)
 }
 
-export const TEMPLATE_ZONE_MAP: Record<Template, Zone> = {
-  Endurance: "Z2", // user lavora a Z2–Z3, scegliamo Z2 come default
-  Threshold: "Z4", // TS sempre in Z4
-  "VO2 Max": "Z5", // VO2 su Z5+ → scegliamo Z5
+export const TEMPLATE_ZONE_MAP: Record<Template, Zone[]> = {
+  Endurance: ["Z2", "Z3"], // prevalenza Z2–Z3
+  Threshold: ["Z4"], // prevalenza Z4
+  "VO2 Max": ["Z5", "Z6"], // prevalenza Z5–Z6
 };

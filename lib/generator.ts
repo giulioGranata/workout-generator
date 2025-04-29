@@ -1,4 +1,4 @@
-import { Template, ZONE_MAP, ZONES } from "./constants";
+import { Template, TEMPLATE_ZONE_MAP, ZONE_MAP, ZONES } from "./constants";
 import { WorkoutBlock, WorkoutInput, Zone } from "./types";
 import { getZoneColorByFtp } from "./utils";
 
@@ -8,9 +8,13 @@ export function generateWorkout({
   zone, // string, ma ora sempre derivata da template
   template,
 }: WorkoutInput & { zone: Zone }): { text: string; blocks: WorkoutBlock[] } {
-  const workoutName = getWorkoutName(zone);
+  const workoutName = getWorkoutName(template);
   const zoneTable = getZoneTable(ftp);
-  const mainBlocks = generateMainBlocks(zone, duration, template);
+  const mainBlocks = generateMainBlocks(
+    TEMPLATE_ZONE_MAP[template],
+    duration,
+    template
+  );
 
   const blocks: WorkoutBlock[] = [
     { label: "Warm-up", duration: 10, ftp: 0.6, color: getZoneColorByFtp(0.6) },
@@ -40,12 +44,23 @@ ${zoneTable}
 }
 
 export function generateMainBlocks(
-  zone: Zone,
+  zonesOrZone: Zone | Zone[],
   totalMinutes: number,
   template: Template
 ): WorkoutBlock[] {
-  // escludi warm-up (10′) e cool-down (5′)
+  // normalize to an array
+  const zones = Array.isArray(zonesOrZone) ? zonesOrZone : [zonesOrZone];
+
   const mainMinutes = totalMinutes - 15;
+
+  // compute average factor across the zones pool
+  const avgFactor =
+    zones
+      .map((z) => {
+        const [minF, maxF] = ZONE_MAP[z];
+        return (minF + maxF) / 2;
+      })
+      .reduce((a, b) => a + b, 0) / zones.length;
 
   switch (template) {
     case "Endurance":
@@ -53,50 +68,50 @@ export function generateMainBlocks(
         {
           label: "Endurance",
           duration: mainMinutes,
-          ftp: 1, // valore fittizio per i test
-          color: getZoneColorByFtp(1),
+          ftp: avgFactor,
+          color: getZoneColorByFtp(avgFactor),
         },
       ];
 
     case "Threshold": {
-      const onMin = 5;
-      const offMin = 3;
-      const pairs = Math.floor(mainMinutes / (onMin + offMin));
+      const onMin = 5,
+        offMin = 3,
+        pairs = Math.floor(mainMinutes / (onMin + offMin));
       const blocks: WorkoutBlock[] = [];
       for (let i = 0; i < pairs; i++) {
         blocks.push({
           label: "Work",
           duration: onMin,
-          ftp: 1,
-          color: getZoneColorByFtp(1),
+          ftp: avgFactor,
+          color: getZoneColorByFtp(avgFactor),
         });
         blocks.push({
           label: "Rest",
           duration: offMin,
-          ftp: 1,
-          color: getZoneColorByFtp(1),
+          ftp: 0.6,
+          color: getZoneColorByFtp(0.6),
         });
       }
       return blocks;
     }
 
     case "VO2 Max": {
-      const onMin = 0.5;
-      const offMin = 1.5;
-      const pairs = Math.floor(mainMinutes / (onMin + offMin));
+      const onMin = 0.5,
+        offMin = 1.5,
+        pairs = Math.floor(mainMinutes / (onMin + offMin));
       const blocks: WorkoutBlock[] = [];
       for (let i = 0; i < pairs; i++) {
         blocks.push({
           label: "VO2 On",
           duration: onMin,
-          ftp: 1,
-          color: getZoneColorByFtp(1),
+          ftp: avgFactor * 1.1,
+          color: getZoneColorByFtp(avgFactor * 1.1),
         });
         blocks.push({
           label: "Recovery",
           duration: offMin,
-          ftp: 1,
-          color: getZoneColorByFtp(1),
+          ftp: 0.5,
+          color: getZoneColorByFtp(0.5),
         });
       }
       return blocks;
@@ -106,11 +121,11 @@ export function generateMainBlocks(
       return [];
   }
 }
+function getWorkoutName(template: Template): string {
+  // prendi la prima zona del pool (per Endurance → Z2, Threshold → Z4, VO2 → Z5)
+  const zone = TEMPLATE_ZONE_MAP[template][0];
 
-function getWorkoutName(zone: Zone): string {
-  const fallbackName = (z: Zone) => [`Custom ${z} Ride`];
-
-  const customNames: Partial<Record<Zone, string[]>> = {
+  const customNames: Record<Zone, string[]> = {
     Z1: ["Easy Breeze", "Recovery Ride", "Zen Spin"],
     Z2: ["Enduro Engine", "Fat Burn Flow", "Steady Spin"],
     Z3: ["Tempo Tracker", "Rolling Thunder", "Push Cruise"],
@@ -120,11 +135,7 @@ function getWorkoutName(zone: Zone): string {
     Z7: ["Sprint Storm", "Maximum Chaos", "Nuclear Launch"],
   };
 
-  const names: Record<Zone, string[]> = Object.fromEntries(
-    ZONES.map((z) => [z, customNames[z] ?? fallbackName(z)])
-  ) as Record<Zone, string[]>;
-
-  const options = names[zone];
+  const options = customNames[zone] || [`Custom ${zone} Ride`];
   return options[Math.floor(Math.random() * options.length)];
 }
 
