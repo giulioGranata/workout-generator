@@ -1,3 +1,5 @@
+[![CI](https://github.com/giulioGranata/workout-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/giulioGranata/workout-generator/actions)
+
 # Workout Generator
 
 [![Live Demo](https://img.shields.io/website?url=https%3A%2F%2Fworkout-generator-chi.vercel.app)](https://workout-generator-chi.vercel.app)

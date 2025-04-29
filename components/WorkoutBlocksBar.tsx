@@ -23,7 +23,6 @@ export function WorkoutBlocksBar({ blocks, ftp }: Props) {
   const [canHover, setCanHover] = useState(false);
 
   useEffect(() => {
-    // rileva se il device supporta hover
     const mql = window.matchMedia("(hover: hover)");
     setCanHover(mql.matches);
     const listener = (e: MediaQueryListEvent) => setCanHover(e.matches);
@@ -33,14 +32,11 @@ export function WorkoutBlocksBar({ blocks, ftp }: Props) {
 
   return (
     <div className="w-full">
-      <div className="flex h-24 overflow-hidden rounded-xl bg-transparent">
+      <div className="flex h-20 lg:h-24 overflow-hidden rounded-xl bg-transparent">
         {blocks.map((b, i) => {
           const trigger = (
             <div
-              className="
-                flex-shrink-0 h-full transition-all duration-200
-                hover:brightness-90 cursor-pointer
-              "
+              className="flex-shrink-0 h-full transition-all duration-200 hover:brightness-90 cursor-pointer"
               style={{
                 flex: b.duration,
                 backgroundColor: b.color,
