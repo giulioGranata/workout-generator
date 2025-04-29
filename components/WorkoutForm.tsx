@@ -1,68 +1,68 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { toast } from "sonner"
-import { generateWorkout } from "@/lib/generator"
-import { TEMPLATES, TEMPLATE_ZONE_MAP, Template } from "@/lib/constants"
-import type { WorkoutBlock } from "@/lib/types"
+} from "@/components/ui/select";
+import { TEMPLATES, TEMPLATE_ZONE_MAP, Template } from "@/lib/constants";
+import { generateWorkout } from "@/lib/generator";
+import type { WorkoutBlock } from "@/lib/types";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export function WorkoutForm({
   onGenerate,
 }: {
-  onGenerate: (text: string, blocks: WorkoutBlock[], ftp: number) => void
+  onGenerate: (text: string, blocks: WorkoutBlock[], ftp: number) => void;
 }) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // form state
-  const [template, setTemplate] = useState<Template>(TEMPLATES[0])
-  const [ftp, setFtp] = useState<string>("")
-  const [duration, setDuration] = useState<string>("")
+  const [template, setTemplate] = useState<Template>(TEMPLATES[0]);
+  const [ftp, setFtp] = useState<string>("");
+  const [duration, setDuration] = useState<string>("");
 
   // init from querystring
   useEffect(() => {
-    const qFtp = searchParams.get("ftp")
-    const qDur = searchParams.get("duration")
-    const qTpl = searchParams.get("template")
-    if (qFtp) setFtp(qFtp)
-    if (qDur) setDuration(qDur)
+    const qFtp = searchParams.get("ftp");
+    const qDur = searchParams.get("duration");
+    const qTpl = searchParams.get("template");
+    if (qFtp) setFtp(qFtp);
+    if (qDur) setDuration(qDur);
     if (qTpl && TEMPLATES.includes(qTpl as Template))
-      setTemplate(qTpl as Template)
-  }, [searchParams])
+      setTemplate(qTpl as Template);
+  }, [searchParams]);
 
   const handleGenerate = () => {
     if (!ftp || !duration) {
-      toast("Please fill all fields")
-      return
+      toast("Please fill all fields");
+      return;
     }
 
-    const zone = TEMPLATE_ZONE_MAP[template]
+    const [selectedZone] = TEMPLATE_ZONE_MAP[template];
+
     const { text, blocks } = generateWorkout({
       ftp: parseInt(ftp, 10),
       duration: parseInt(duration, 10),
-      zone,
+      zone: selectedZone,
       template,
-    })
+    });
 
-    onGenerate(text, blocks, parseInt(ftp, 10))
+    onGenerate(text, blocks, parseInt(ftp, 10));
 
     // update URL querystring (shallow)
-    router.replace(
-      `?ftp=${ftp}&duration=${duration}&template=${template}`,
-      { scroll: false }
-    )
-  }
+    router.replace(`?ftp=${ftp}&duration=${duration}&template=${template}`, {
+      scroll: false,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -110,5 +110,5 @@ export function WorkoutForm({
 
       <Button onClick={handleGenerate}>Generate workout</Button>
     </div>
-  )
+  );
 }
