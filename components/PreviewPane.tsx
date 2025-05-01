@@ -24,7 +24,7 @@ export function PreviewPane({
           bg-zinc-100 dark:bg-zinc-900 
           rounded font-mono text-sm leading-relaxed 
           text-zinc-900 dark:text-zinc-100 
-          max-w-full overflow-auto
+         w-full max-w-md mx-auto
         "
       >
         <pre className="m-0 pr-12 whitespace-pre-wrap break-words w-full">

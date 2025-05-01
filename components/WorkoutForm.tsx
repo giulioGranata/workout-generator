@@ -1,21 +1,21 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectContent,
+  SelectItem,
 } from "@/components/ui/select";
-import { TEMPLATES, Template } from "@/lib/constants";
-import { generateWorkout } from "@/lib/generator";
-import type { WorkoutBlock } from "@/lib/types";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { generateWorkout } from "@/lib/generator";
+import { TEMPLATES, Template } from "@/lib/constants";
+import type { WorkoutBlock } from "@/lib/types";
 
 export function WorkoutForm({
   onGenerate,
@@ -62,50 +62,54 @@ export function WorkoutForm({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Template */}
-      <div className="space-y-2">
-        <Label>Template</Label>
-        <Select
-          value={template}
-          onValueChange={(v) => setTemplate(v as Template)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Choose style" />
-          </SelectTrigger>
-          <SelectContent>
-            {TEMPLATES.map((t) => (
-              <SelectItem key={t} value={t}>
-                {t}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="p-6 bg-white dark:bg-zinc-800 rounded-lg shadow-md h-fit">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Template */}
+        <div className="space-y-2">
+          <Label>Template</Label>
+          <Select value={template} onValueChange={(v) => setTemplate(v as Template)}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Choose style" />
+            </SelectTrigger>
+            <SelectContent>
+              {TEMPLATES.map((t) => (
+                <SelectItem key={t} value={t}>{t}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      {/* FTP */}
-      <div className="space-y-2">
-        <Label htmlFor="ftp">FTP (W)</Label>
-        <Input
-          id="ftp"
-          type="number"
-          value={ftp}
-          onChange={(e) => setFtp(e.target.value)}
-        />
-      </div>
+        {/* FTP */}
+        <div className="space-y-2">
+          <Label htmlFor="ftp">FTP (W)</Label>
+          <Input
+            id="ftp"
+            type="number"
+            placeholder="e.g. 250"
+            value={ftp}
+            onChange={(e) => setFtp(e.target.value)}
+            className="w-full"
+          />
+        </div>
 
-      {/* Duration */}
-      <div className="space-y-2">
-        <Label htmlFor="duration">Duration (min)</Label>
-        <Input
-          id="duration"
-          type="number"
-          value={duration}
-          onChange={(e) => setDuration(e.target.value)}
-        />
-      </div>
+        {/* Duration */}
+        <div className="space-y-2">
+          <Label htmlFor="duration">Duration (min)</Label>
+          <Input
+            id="duration"
+            type="number"
+            placeholder="e.g. 60"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            className="w-full"
+          />
+        </div>
 
-      <Button onClick={handleGenerate}>Generate workout</Button>
+        {/* Generate button */}
+        <div className="md:col-span-2 flex justify-center md:justify-end">
+          <Button onClick={handleGenerate}>Generate workout</Button>
+        </div>
+      </div>
     </div>
   );
 }

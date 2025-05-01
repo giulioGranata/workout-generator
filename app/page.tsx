@@ -11,8 +11,9 @@ export default function WorkoutPage() {
   const [ftp, setFtp] = useState(0);
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="grid gap-8 lg:grid-cols-[320px_1fr]">
+    <main className="w-full max-w-md sm:max-w-lg lg:max-w-5xl mx-auto py-12 px-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* form sempre full-width su mobile, metà‐schermo su desktop */}
         <Suspense fallback={null}>
           <WorkoutForm
             onGenerate={(text, b, f) => {
